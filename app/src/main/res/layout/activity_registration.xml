@@ -43,12 +43,4 @@
         app:layout_constraintStart_toStartOf="@+id/RPassword"
         app:layout_constraintTop_toBottomOf="@+id/RPassword" />
 
-    <Button
-        android:id="@+id/varific"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Varification"
-        app:layout_constraintEnd_toEndOf="@+id/signUp"
-        app:layout_constraintStart_toStartOf="@+id/signUp"
-        app:layout_constraintTop_toBottomOf="@+id/signUp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

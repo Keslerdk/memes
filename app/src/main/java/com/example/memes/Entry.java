@@ -18,14 +18,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class MainActivity extends AppCompatActivity {
+public class Entry extends AppCompatActivity {
     private static final int RC_SIGN_IN = 120;
     private FirebaseAuth mAuth;
     private GoogleSignInClient googleSignInClient;
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_entry);
         mAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         newAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Registration.class);
+                Intent intent = new Intent(Entry.this, Registration.class);
                 startActivity(intent);
             }
         });
@@ -92,10 +91,12 @@ public class MainActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful())
-                    Toast.makeText(MainActivity.this, "Авторизация успешна", Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(MainActivity.this, "Авторизация провалена", Toast.LENGTH_SHORT).show();
+                if (task.isSuccessful()) {
+                    Toast.makeText(Entry.this, "Авторизация успешна", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Entry.this, Profile.class);
+                    startActivity(intent);
+                } else
+                    Toast.makeText(Entry.this, "Авторизация провалена", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -137,9 +138,12 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("yes", "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            Intent intent = new Intent(Entry.this, Profile.class);
+                            startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("no", "signInWithCredential:failure", task.getException());
+                            Toast.makeText(Entry.this, "smth went wrong", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
