@@ -1,3 +1,4 @@
 <resources>
+    <integer name="com_vk_sdk_AppId">7746183</integer>
     <string name="app_name">memes</string>
 </resources>

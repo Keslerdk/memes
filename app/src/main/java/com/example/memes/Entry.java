@@ -23,11 +23,23 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.vk.api.sdk.VK;
+import com.vk.api.sdk.VKApiCallback;
+import com.vk.api.sdk.auth.VKAuthCallback;
+import com.vk.api.sdk.auth.VKScope;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+
+
 
 public class Entry extends AppCompatActivity {
     private static final int RC_SIGN_IN = 120;
     private FirebaseAuth mAuth;
+
     private GoogleSignInClient googleSignInClient;
+
 
     private EditText Elogin;
     private EditText Epassword;
@@ -35,6 +47,7 @@ public class Entry extends AppCompatActivity {
     private Button SignIn;
     private Button newAcc;
     private Button googleSignIn;
+    private Button vkAuth;
 
 
     @Override
@@ -49,12 +62,15 @@ public class Entry extends AppCompatActivity {
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
+        VK.initialize(this);
+
         Elogin = (EditText) findViewById(R.id.editLogin);
         Epassword = (EditText) findViewById(R.id.editPassword);
 
         SignIn = (Button) findViewById(R.id.signIn);
         newAcc = (Button) findViewById(R.id.newAcc);
         googleSignIn = (Button) findViewById(R.id.googleSighIn);
+        vkAuth = (Button) findViewById(R.id.vkAuth);
 
         SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +88,13 @@ public class Entry extends AppCompatActivity {
         googleSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                signInGoogle();
+            }
+        });
+        vkAuth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VK.login(Entry.this, Arrays.asList(VKScope.WALL, VKScope.PHOTOS));
             }
         });
     }
@@ -101,32 +123,53 @@ public class Entry extends AppCompatActivity {
         });
     }
 
-    private void signIn() {
+    private void signInGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent  data) {
+        switch (resultCode) {
+            case RC_SIGN_IN:
+                super.onActivityResult(requestCode, resultCode, data);
+                // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+                if (requestCode == RC_SIGN_IN) {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    try {
+                        // Google Sign In was successful, authenticate with Firebase
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        Log.d("yes", "firebaseAuthWithGoogle:" + account.getId());
+                        firebaseAuthWithGoogle(account.getIdToken());
+                    } catch (ApiException e) {
+                        // Google Sign In failed, update UI appropriately
+                        Log.w("no", "Google sign in failed", e);
+                        // ...
+                    }
 
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d("yes", "firebaseAuthWithGoogle:" + account.getId());
-                firebaseAuthWithGoogle(account.getIdToken());
-            } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-                Log.w("no", "Google sign in failed", e);
-                // ...
-            }
+                }
+                break;
+            default:
+                VKApiCallback callback = new VKApiCallback() {
+                    @Override
+                    public void success(Object o) {
+                        Toast.makeText(Entry.this, "Good", Toast.LENGTH_SHORT);
+                    }
 
+                    @Override
+                    public void fail(@NotNull Exception e) {
+                        Toast.makeText(Entry.this, "Error", Toast.LENGTH_SHORT);
+                    }
+                };
+//                if (data == null || !VK.onActivityResult(requestCode, resultCode, data, (VKAuthCallback) callback)) {
+//                    Toast.makeText(Entry.this, "Error2", Toast.LENGTH_SHORT);
+//                    super.onActivityResult(requestCode, resultCode, data);
+//                }
+                break;
         }
     }
+
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);

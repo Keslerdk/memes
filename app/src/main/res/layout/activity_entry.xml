@@ -67,4 +67,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/vkAuth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="sign with vk"
+        app:layout_constraintBottom_toTopOf="@+id/googleSighIn"
+        app:layout_constraintEnd_toEndOf="@+id/googleSighIn"
+        app:layout_constraintStart_toStartOf="@+id/googleSighIn" />
 </androidx.constraintlayout.widget.ConstraintLayout>
