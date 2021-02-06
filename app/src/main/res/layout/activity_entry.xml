@@ -76,4 +76,5 @@
         app:layout_constraintBottom_toTopOf="@+id/googleSighIn"
         app:layout_constraintEnd_toEndOf="@+id/googleSighIn"
         app:layout_constraintStart_toStartOf="@+id/googleSighIn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

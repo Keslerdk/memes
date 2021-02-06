@@ -3,12 +3,14 @@ package com.example.memes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -18,20 +20,29 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.vk.api.sdk.VK;
 import com.vk.api.sdk.VKApiCallback;
+import com.vk.api.sdk.auth.VKAccessToken;
 import com.vk.api.sdk.auth.VKAuthCallback;
 import com.vk.api.sdk.auth.VKScope;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-
 
 
 public class Entry extends AppCompatActivity {
@@ -44,12 +55,14 @@ public class Entry extends AppCompatActivity {
     private EditText Elogin;
     private EditText Epassword;
 
+
     private Button SignIn;
     private Button newAcc;
     private Button googleSignIn;
     private Button vkAuth;
 
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +75,10 @@ public class Entry extends AppCompatActivity {
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        VK.initialize(this);
 
         Elogin = (EditText) findViewById(R.id.editLogin);
         Epassword = (EditText) findViewById(R.id.editPassword);
+
 
         SignIn = (Button) findViewById(R.id.signIn);
         newAcc = (Button) findViewById(R.id.newAcc);
@@ -94,7 +107,7 @@ public class Entry extends AppCompatActivity {
         vkAuth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VK.login(Entry.this, Arrays.asList(VKScope.WALL, VKScope.PHOTOS));
+                VK.login(Entry.this, Arrays.asList(VKScope.EMAIL, VKScope.WALL));
             }
         });
     }
@@ -129,7 +142,7 @@ public class Entry extends AppCompatActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent  data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RC_SIGN_IN:
                 super.onActivityResult(requestCode, resultCode, data);
@@ -151,25 +164,29 @@ public class Entry extends AppCompatActivity {
                 }
                 break;
             default:
-                VKApiCallback callback = new VKApiCallback() {
+                VKAuthCallback callback = new VKAuthCallback() {
                     @Override
-                    public void success(Object o) {
-                        Toast.makeText(Entry.this, "Good", Toast.LENGTH_SHORT);
+                    public void onLogin(@NotNull VKAccessToken vkAccessToken) {
+                        try {
+                            Log.d("vkid", String.valueOf(vkAccessToken.getUserId()));
+                            firebaseAuthwithVk(String.valueOf(vkAccessToken.getUserId())+"@vk.auth", String.valueOf(vkAccessToken.getUserId()));
+                        } catch (Exception e) {
+                        }
+
                     }
 
                     @Override
-                    public void fail(@NotNull Exception e) {
+                    public void onLoginFailed(int i) {
                         Toast.makeText(Entry.this, "Error", Toast.LENGTH_SHORT);
                     }
                 };
-//                if (data == null || !VK.onActivityResult(requestCode, resultCode, data, (VKAuthCallback) callback)) {
-//                    Toast.makeText(Entry.this, "Error2", Toast.LENGTH_SHORT);
-//                    super.onActivityResult(requestCode, resultCode, data);
-//                }
+                if (data == null || !VK.onActivityResult(requestCode, resultCode, data, (VKAuthCallback) callback)) {
+                    Toast.makeText(Entry.this, "Error2", Toast.LENGTH_SHORT);
+                    super.onActivityResult(requestCode, resultCode, data);
+                }
                 break;
         }
     }
-
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
@@ -190,5 +207,62 @@ public class Entry extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void firebaseAuthwithVk(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Intent intent= new Intent (Entry.this, Profile.class);
+                    startActivity(intent);
+                }
+                else {
+                    try {
+                        throw task.getException();
+                    }
+                    catch (FirebaseAuthInvalidUserException e) {
+                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    Intent intent = new Intent(Entry.this, Profile.class);
+                                    startActivity(intent);
+                                }
+                                else Toast.makeText(Entry.this, "smth gone wrong", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        /*
+//        Log.d("vkAuthToken", AccessToken);
+//        String customToken = FirebaseAuth.getInstance().createCustomToken(AccessToken);
+        String token = FirebaseAuth.getInstance().creatCustomToken();
+        mAuth.signInWithCustomToken(customToken)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("yes", "signInWithCustomToken:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Intent intent =  new Intent(Entry.this, Profile.class);
+                            startActivity(intent);
+                            Toast.makeText(Entry.this, "Good", Toast.LENGTH_SHORT);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("vkAuth", "signInWithCustomToken:failure", task.getException());
+                            Toast.makeText(Entry.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }); */
+ 
     }
 }
