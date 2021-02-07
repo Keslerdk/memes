@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,15 +14,23 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Registration extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
-    private EditText Rlogin;
-    private EditText Rpassword;
-    private Button SignUp;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+
+    private EditText rname;
+    private EditText ruserName;
+    private EditText rEmail;
+    private EditText rPassword;
+    private EditText rPassword2;
+
+    private Button signUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,22 +39,34 @@ public class Registration extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        Rlogin = (EditText) findViewById(R.id.Remail);
-        Rpassword = (EditText) findViewById(R.id.RPassword);
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("users");
+        myRef.setValue("First data storage");
 
-        SignUp = (Button) findViewById(R.id.signUp);
+        rname = (EditText) findViewById(R.id.name);
+        ruserName= (EditText) findViewById(R.id.userName);
+        rEmail = (EditText) findViewById(R.id.rEmail);
+        rPassword = (EditText) findViewById(R.id.rPassword);
+        rPassword2 = (EditText) findViewById(R.id.rPassword2);
+
+        signUp = (Button) findViewById(R.id.signUp);
 
 
-        SignUp.setOnClickListener(new View.OnClickListener() {
+        signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registration(Rlogin.getText().toString(), Rpassword.getText().toString());
+                String name = rname.getText().toString();
+                String username = ruserName.getText().toString();
+                String email = rEmail.getText().toString();
+                String password = rPassword.getText().toString();
+                registration(email, password);
+                addUser(name, username, email, password);
             }
         });
 
     }
 
-    public void registration(String email, String password) {
+    private void registration(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -60,6 +79,11 @@ public class Registration extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private  void addUser (String name, String userName, String email, String password) {
+        UsersHelperClass helperClass = new UsersHelperClass(name, userName, email, password);
+        myRef.child(userName).setValue(helperClass);
     }
 
 

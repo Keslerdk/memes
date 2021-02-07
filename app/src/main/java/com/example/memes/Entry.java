@@ -34,6 +34,8 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.vk.api.sdk.VK;
 import com.vk.api.sdk.VKApiCallback;
 import com.vk.api.sdk.auth.VKAccessToken;
@@ -47,11 +49,14 @@ import java.util.Arrays;
 
 public class Entry extends AppCompatActivity {
     private static final int RC_SIGN_IN = 120;
+
     private FirebaseAuth mAuth;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
 
     private GoogleSignInClient googleSignInClient;
 
-
+    //элементы в активити
     private EditText Elogin;
     private EditText Epassword;
 
@@ -67,7 +72,11 @@ public class Entry extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
+
         mAuth = FirebaseAuth.getInstance();
+
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("users");
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -85,6 +94,7 @@ public class Entry extends AppCompatActivity {
         googleSignIn = (Button) findViewById(R.id.googleSighIn);
         vkAuth = (Button) findViewById(R.id.vkAuth);
 
+        //обработка нажатий
         SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +132,7 @@ public class Entry extends AppCompatActivity {
         }
     }
 
+    //вход через почту
     public void signing(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -136,6 +147,7 @@ public class Entry extends AppCompatActivity {
         });
     }
 
+    //вход через гугл
     private void signInGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -144,6 +156,8 @@ public class Entry extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
+
+            //гугл
             case RC_SIGN_IN:
                 super.onActivityResult(requestCode, resultCode, data);
                 // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
@@ -164,11 +178,15 @@ public class Entry extends AppCompatActivity {
                 }
                 break;
             default:
+                //вк
                 VKAuthCallback callback = new VKAuthCallback() {
                     @Override
                     public void onLogin(@NotNull VKAccessToken vkAccessToken) {
                         try {
                             Log.d("vkid", String.valueOf(vkAccessToken.getUserId()));
+                            //авторазиция через вк с помощью почты
+                            //userId+@vk.auth - почта
+                            //UserId - пароль
                             firebaseAuthwithVk(String.valueOf(vkAccessToken.getUserId())+"@vk.auth", String.valueOf(vkAccessToken.getUserId()));
                         } catch (Exception e) {
                         }
@@ -210,6 +228,7 @@ public class Entry extends AppCompatActivity {
     }
 
     private void firebaseAuthwithVk(String email, String password) {
+        //попробовать войти, если акк не сущесвует, создать и войти.
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -239,7 +258,7 @@ public class Entry extends AppCompatActivity {
                 }
             }
         });
-
+        //попытка через customToken
         /*
 //        Log.d("vkAuthToken", AccessToken);
 //        String customToken = FirebaseAuth.getInstance().createCustomToken(AccessToken);
