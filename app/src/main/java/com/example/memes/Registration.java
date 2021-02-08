@@ -44,12 +44,12 @@ public class Registration extends AppCompatActivity {
         myRef.setValue("First data storage");
 
         rname = (EditText) findViewById(R.id.name);
-        ruserName= (EditText) findViewById(R.id.userName);
+        ruserName = (EditText) findViewById(R.id.userName);
         rEmail = (EditText) findViewById(R.id.rEmail);
         rPassword = (EditText) findViewById(R.id.rPassword);
         rPassword2 = (EditText) findViewById(R.id.rPassword2);
 
-        signUp = (Button) findViewById(R.id.signUp);
+        signUp = (Button) findViewById(R.id.next_button);
 
 
         signUp.setOnClickListener(new View.OnClickListener() {
@@ -59,8 +59,11 @@ public class Registration extends AppCompatActivity {
                 String username = ruserName.getText().toString();
                 String email = rEmail.getText().toString();
                 String password = rPassword.getText().toString();
-                registration(email, password);
-                addUser(name, username, email, password);
+                //плохо работает.
+                if (emptyField(rname) && emptyField(ruserName) && emptyField(rEmail) && emptyField(rPassword)) {
+                    registration(email, password);
+                    addUser(name, username, email, password);
+                }
             }
         });
 
@@ -81,10 +84,19 @@ public class Registration extends AppCompatActivity {
         });
     }
 
-    private  void addUser (String name, String userName, String email, String password) {
+    private void addUser(String name, String userName, String email, String password) {
         UsersHelperClass helperClass = new UsersHelperClass(name, userName, email, password);
         myRef.child(userName).setValue(helperClass);
     }
 
+    private boolean emptyField(EditText editText) {
+        if (editText.getText().toString().isEmpty()) {
+            editText.setError("Field can't be empty!");
+            return false;
+        } else {
+            editText.setError(null);
+            return true;
+        }
+    }
 
 }
