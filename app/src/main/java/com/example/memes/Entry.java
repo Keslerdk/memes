@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,8 +35,11 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.vk.api.sdk.VK;
 import com.vk.api.sdk.VKApiCallback;
 import com.vk.api.sdk.auth.VKAccessToken;
@@ -71,7 +75,14 @@ public class Entry extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //убрать верхнюю полоску с временем и зарядкой
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_entry);
+
+        //кнопки и едиты
+        init();
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -84,7 +95,23 @@ public class Entry extends AppCompatActivity {
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
+        //нажатия на кнопочки
+        clickers();
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+        } else {
+        }
+    }
+
+    private void init() {
+        //иницализация кнопок с layout
         Elogin = (EditText) findViewById(R.id.editLogin);
         Epassword = (EditText) findViewById(R.id.editPassword);
 
@@ -93,7 +120,9 @@ public class Entry extends AppCompatActivity {
         newAcc = (Button) findViewById(R.id.newAcc);
         googleSignIn = (Button) findViewById(R.id.googleSighIn);
         vkAuth = (Button) findViewById(R.id.vkAuth);
+    }
 
+    private void clickers () {
         //обработка нажатий
         SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,16 +151,6 @@ public class Entry extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-        } else {
-        }
-    }
-
     //вход через почту
     public void signing(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -151,11 +170,20 @@ public class Entry extends AppCompatActivity {
     private void signInGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+
+        //добавить в базу данных.
+        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
+        if (googleSignInAccount!=null) {
+            String name = googleSignInAccount.getDisplayName();
+            String username = googleSignInAccount.getId();
+            String email = googleSignInAccount.getEmail();
+            createDataBaseUser(name, username, email);
+        }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
+        switch (requestCode) {
 
             //гугл
             case RC_SIGN_IN:
@@ -178,16 +206,24 @@ public class Entry extends AppCompatActivity {
                 }
                 break;
             default:
-                //вк
+//                вк
                 VKAuthCallback callback = new VKAuthCallback() {
                     @Override
                     public void onLogin(@NotNull VKAccessToken vkAccessToken) {
                         try {
+                            //РАЗОБРАТЬСЯ С ВК АПИ И СДЕЛАТЬ ПО ЧЕЛОВЕЧЕСКИ !!!
                             Log.d("vkid", String.valueOf(vkAccessToken.getUserId()));
                             //авторазиция через вк с помощью почты
                             //userId+@vk.auth - почта
                             //UserId - пароль
                             firebaseAuthwithVk(String.valueOf(vkAccessToken.getUserId())+"@vk.auth", String.valueOf(vkAccessToken.getUserId()));
+
+                            String name = String.valueOf(vkAccessToken.getUserId());
+                            String username = String.valueOf(vkAccessToken.getUserId());
+                            String email = String.valueOf(vkAccessToken.getUserId())+"@vk.auth";
+
+                            createDataBaseUser(name, username, email);
+
                         } catch (Exception e) {
                         }
 
@@ -282,6 +318,24 @@ public class Entry extends AppCompatActivity {
                         }
                     }
                 }); */
- 
+    }
+
+    //прооверка, существует ли такой пользователь в бд
+    // если нет, создать.
+    private void createDataBaseUser (String name, String username, String email) {
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.child(username).exists()) {
+                    UsersHelperClass googleuser = new UsersHelperClass(name, username, email);
+//            myRef.push().setValue(googleuser);
+                    myRef.child(username).setValue(googleuser);
+                }else{
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 }

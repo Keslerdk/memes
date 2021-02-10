@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class Registration extends AppCompatActivity {
+
 
     private FirebaseAuth mAuth;
 
@@ -35,13 +37,13 @@ public class Registration extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //убрать верхнюю полоску с временем и зарядкой
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_registration);
 
         mAuth = FirebaseAuth.getInstance();
 
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("users");
-        myRef.setValue("First data storage");
+
 
         rname = (EditText) findViewById(R.id.name);
         ruserName = (EditText) findViewById(R.id.userName);
@@ -55,6 +57,9 @@ public class Registration extends AppCompatActivity {
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                database = FirebaseDatabase.getInstance();
+                myRef = database.getReference("users");
+
                 String name = rname.getText().toString();
                 String username = ruserName.getText().toString();
                 String email = rEmail.getText().toString();
@@ -62,7 +67,7 @@ public class Registration extends AppCompatActivity {
                 //плохо работает.
                 if (emptyField(rname) && emptyField(ruserName) && emptyField(rEmail) && emptyField(rPassword)) {
                     registration(email, password);
-                    addUser(name, username, email, password);
+                    addUser(name, username, email);
                 }
             }
         });
@@ -84,9 +89,10 @@ public class Registration extends AppCompatActivity {
         });
     }
 
-    private void addUser(String name, String userName, String email, String password) {
-        UsersHelperClass helperClass = new UsersHelperClass(name, userName, email, password);
-        myRef.child(userName).setValue(helperClass);
+    private void addUser(String name, String userName, String email) {
+        UsersHelperClass helperClass = new UsersHelperClass(name, userName, email);
+//        myRef.child(userName).setValue(helperClass);
+        myRef.push().setValue(helperClass);
     }
 
     private boolean emptyField(EditText editText) {

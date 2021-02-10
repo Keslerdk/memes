@@ -7,11 +7,10 @@ public class UsersHelperClass {
 
     }
 
-    public UsersHelperClass(String name, String userName, String email, String password) {
+    public UsersHelperClass(String name, String userName, String email) {
         this.name = name;
         this.userName = userName;
         this.email = email;
-        this.password = password;
     }
 
     public String getName() {
@@ -38,11 +37,4 @@ public class UsersHelperClass {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

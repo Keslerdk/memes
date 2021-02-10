@@ -13,12 +13,13 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="24dp"
-        android:paddingTop="16dp">
+        android:paddingTop="16dp"
+        >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="45dp"
+            android:layout_gravity="right"
+            android:textSize="35dp"
             android:text="Registration"/>
         <com.google.android.material.textfield.TextInputLayout
 
@@ -26,7 +27,7 @@
             android:layout_height="wrap_content"
             android:hint="Name"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             app:errorEnabled="true"
             >
             <com.google.android.material.textfield.TextInputEditText
@@ -44,7 +45,6 @@
             android:layout_height="wrap_content"
             android:hint="User Name"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="8dp"
             app:errorEnabled="true">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/userName"
@@ -61,7 +61,6 @@
             android:layout_height="wrap_content"
             android:hint="Email"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="8dp"
             app:errorEnabled="true"
             >
             <com.google.android.material.textfield.TextInputEditText
@@ -79,7 +78,6 @@
             android:layout_height="wrap_content"
             android:hint="Password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="8dp"
             app:endIconMode="password_toggle"
             app:errorEnabled="true">
             <com.google.android.material.textfield.TextInputEditText
@@ -97,7 +95,6 @@
             android:layout_height="wrap_content"
             android:hint="Repeat password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_marginTop="8dp"
             app:endIconMode="password_toggle"
             app:errorEnabled="true">
             <com.google.android.material.textfield.TextInputEditText
@@ -109,29 +106,40 @@
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <RelativeLayout
+<!--        <RelativeLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="16dp">-->
+<!--            <Button-->
+<!--                android:id="@+id/next_button"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:layout_alignParentRight="true"-->
+<!--                android:text="Next"/>-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Cancel"-->
+<!--                style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--                android:layout_marginRight="12dp"-->
+<!--                android:layout_marginEnd="12dp"-->
+<!--                android:layout_toStartOf="@+id/next_button"-->
+<!--                android:layout_toLeftOf="@+id/next_button"-->
+<!--                />-->
+
+<!--        </RelativeLayout>-->
+        <Button
+            android:id="@+id/next_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-            <Button
-                android:id="@+id/next_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:text="Next"/>
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cancel"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_marginRight="12dp"
-                android:layout_marginEnd="12dp"
-                android:layout_toStartOf="@+id/next_button"
-                android:layout_toLeftOf="@+id/next_button"
-                />
+            android:text="Next"/>
 
-        </RelativeLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Есть аккаунт? Войти"
+            style="@style/Widget.MaterialComponents.Button.TextButton"/>
     </LinearLayout>
 </ScrollView>
 

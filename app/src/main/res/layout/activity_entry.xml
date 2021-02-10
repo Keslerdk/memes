@@ -1,80 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Entry">
-
-    <EditText
-        android:id="@+id/editPassword"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/editLogin"
-        app:layout_constraintStart_toStartOf="@+id/editLogin"
-        app:layout_constraintTop_toBottomOf="@+id/editLogin" />
+        android:orientation="vertical"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="14dp"
+        android:paddingTop="16dp"
+        android:layout_marginTop="150dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LOG IN"
+            android:textSize="35dp"
+            android:gravity="center"/>
 
-    <Button
-        android:id="@+id/signIn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Sign In"
-        app:layout_constraintEnd_toEndOf="@+id/editPassword"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/editPassword"
-        app:layout_constraintTop_toBottomOf="@+id/editPassword" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:hint="Email">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/newAcc"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Create new account"
-        app:layout_constraintEnd_toEndOf="@+id/signIn"
-        app:layout_constraintHorizontal_bias="0.528"
-        app:layout_constraintStart_toStartOf="@+id/signIn"
-        app:layout_constraintTop_toBottomOf="@+id/signIn" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:hint="Password"
+            app:endIconMode="password_toggle">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:inputType="textPassword"/>
+        </com.google.android.material.textfield.TextInputLayout>
+        <Button
+            android:id="@+id/signIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Вход"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/newAcc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="Регистрация"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:text="Забыли пароль?"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            </RelativeLayout>
+        <Button
+            android:id="@+id/googleSighIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Войти через Google"/>
+        <Button
+            android:id="@+id/vkAuth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Войти через vk"/>
+        </LinearLayout>
 
-    <EditText
-        android:id="@+id/editLogin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--        <Button-->
+<!--            android:id="@+id/googleSighIn"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:layout_marginLeft="16dp"-->
+<!--            android:layout_marginEnd="16dp"-->
+<!--            android:layout_marginRight="16dp"-->
+<!--            android:layout_marginBottom="32dp"-->
+<!--            android:text="Sign with Google Account"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent" />-->
 
-    <Button
-        android:id="@+id/googleSighIn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="32dp"
-        android:text="Sign with Google Account"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+<!--        <Button-->
+<!--            android:id="@+id/vkAuth"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="sign with vk"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/googleSighIn"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/googleSighIn"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/googleSighIn" />-->
 
-    <Button
-        android:id="@+id/vkAuth"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="sign with vk"
-        app:layout_constraintBottom_toTopOf="@+id/googleSighIn"
-        app:layout_constraintEnd_toEndOf="@+id/googleSighIn"
-        app:layout_constraintStart_toStartOf="@+id/googleSighIn" />
+    <!--    <EditText-->
+<!--        android:id="@+id/editPassword"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:ems="10"-->
+<!--        android:hint="Password"-->
+<!--        android:inputType="textPassword"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/editLogin"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/editLogin"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/editLogin" />-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<!--    <Button-->
+<!--        android:id="@+id/signIn"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Sign In"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/editPassword"-->
+<!--        app:layout_constraintHorizontal_bias="0.0"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/editPassword"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/editPassword" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/newAcc"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Create new account"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/signIn"-->
+<!--        app:layout_constraintHorizontal_bias="0.528"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/signIn"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/signIn" />-->
+
+<!--    <EditText-->
+<!--        android:id="@+id/editLogin"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginLeft="16dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:layout_marginRight="16dp"-->
+<!--        android:ems="10"-->
+<!--        android:hint="Email"-->
+<!--        android:inputType="textEmailAddress"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+
+
+</ScrollView>
