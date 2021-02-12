@@ -1,8 +1,5 @@
 package com.example.memes;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +8,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -21,18 +20,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
@@ -40,15 +31,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.NotNull;
 import com.vk.api.sdk.VK;
 import com.vk.api.sdk.VKApiCallback;
 import com.vk.api.sdk.auth.VKAccessToken;
 import com.vk.api.sdk.auth.VKAuthCallback;
 import com.vk.api.sdk.auth.VKScope;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
+
+//import com.google.firebase.database.annotations.NotNull;
+//import com.vk.api.sdk.VK;
+//import com.vk.api.sdk.auth.VKAuthCallback;
+//import com.vk.api.sdk.auth.VKScope;
 
 
 public class Entry extends AppCompatActivity {
@@ -69,6 +64,9 @@ public class Entry extends AppCompatActivity {
     private Button newAcc;
     private Button googleSignIn;
     private Button vkAuth;
+
+//    TransportClient transportClient = HttpTransportClient.getInstance();
+//    VkApiClient vk = new VkApiClient(transportClient);
 
 
     @SuppressLint("WrongViewCast")
@@ -122,7 +120,7 @@ public class Entry extends AppCompatActivity {
         vkAuth = (Button) findViewById(R.id.vkAuth);
     }
 
-    private void clickers () {
+    private void clickers() {
         //обработка нажатий
         SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,6 +145,7 @@ public class Entry extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 VK.login(Entry.this, Arrays.asList(VKScope.EMAIL, VKScope.WALL));
+//                VKSdk.login(Entry.this,VKScope.EMAIL, VKScope.WALL);
             }
         });
     }
@@ -173,7 +172,7 @@ public class Entry extends AppCompatActivity {
 
         //добавить в базу данных.
         GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (googleSignInAccount!=null) {
+        if (googleSignInAccount != null) {
             String name = googleSignInAccount.getDisplayName();
             String username = googleSignInAccount.getId();
             String email = googleSignInAccount.getEmail();
@@ -207,6 +206,8 @@ public class Entry extends AppCompatActivity {
                 break;
             default:
 //                вк
+
+                //vksdk 2.2.0 version
                 VKAuthCallback callback = new VKAuthCallback() {
                     @Override
                     public void onLogin(@NotNull VKAccessToken vkAccessToken) {
@@ -216,13 +217,14 @@ public class Entry extends AppCompatActivity {
                             //авторазиция через вк с помощью почты
                             //userId+@vk.auth - почта
                             //UserId - пароль
-                            firebaseAuthwithVk(String.valueOf(vkAccessToken.getUserId())+"@vk.auth", String.valueOf(vkAccessToken.getUserId()));
+                            firebaseAuthwithVk(String.valueOf(vkAccessToken.getUserId()) + "@vk.auth", String.valueOf(vkAccessToken.getUserId()));
+                            vkrequest(vkAccessToken);
 
-                            String name = String.valueOf(vkAccessToken.getUserId());
-                            String username = String.valueOf(vkAccessToken.getUserId());
-                            String email = String.valueOf(vkAccessToken.getUserId())+"@vk.auth";
+//                            String name = String.valueOf(vkAccessToken.getUserId());
+//                            String username = String.valueOf(vkAccessToken.getUserId());
+//                            String email = String.valueOf(vkAccessToken.getUserId())+"@vk.auth";
 
-                            createDataBaseUser(name, username, email);
+//                            createDataBaseUser(name, username, email);
 
                         } catch (Exception e) {
                         }
@@ -239,6 +241,22 @@ public class Entry extends AppCompatActivity {
                     super.onActivityResult(requestCode, resultCode, data);
                 }
                 break;
+                /*
+                //vksdk 1.6.5
+                if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
+                    @Override
+                    public void onResult(VKAccessToken res) {
+                        firebaseAuthwithVk(String.valueOf(res.userId)+"@vk.auth", String.valueOf(res.userId));
+                        vkrequest(res);
+                        // User passed Authorization
+                    }
+                    @Override
+                    public void onError(VKError error) {
+                        // User didn't pass Authorization
+                    }
+                })) {
+                    super.onActivityResult(requestCode, resultCode, data);
+                }*/
         }
     }
 
@@ -269,26 +287,23 @@ public class Entry extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Intent intent= new Intent (Entry.this, Profile.class);
+                    Intent intent = new Intent(Entry.this, Profile.class);
                     startActivity(intent);
-                }
-                else {
+                } else {
                     try {
                         throw task.getException();
-                    }
-                    catch (FirebaseAuthInvalidUserException e) {
+                    } catch (FirebaseAuthInvalidUserException e) {
                         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     Intent intent = new Intent(Entry.this, Profile.class);
                                     startActivity(intent);
-                                }
-                                else Toast.makeText(Entry.this, "smth gone wrong", Toast.LENGTH_SHORT).show();
+                                } else
+                                    Toast.makeText(Entry.this, "smth gone wrong", Toast.LENGTH_SHORT).show();
                             }
                         });
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -320,9 +335,29 @@ public class Entry extends AppCompatActivity {
                 }); */
     }
 
+    private void vkrequest(VKAccessToken vkAccessToken) {
+        Log.d("test", "!!!");
+        VKUsersRequest request = new VKUsersRequest("users.get");
+
+        VK.execute(request, new VKApiCallback<Object>() {
+            @Override
+            public void success(Object o) {
+                String firstName = request.firstname;
+                String id =request.id;
+                String email =request.firstname+"."+request.secondName+"@vk.auth";
+                createDataBaseUser(firstName, id, email);
+            }
+
+            @Override
+            public void fail(@org.jetbrains.annotations.NotNull Exception e) {
+
+            }
+        });
+    }
+
     //прооверка, существует ли такой пользователь в бд
     // если нет, создать.
-    private void createDataBaseUser (String name, String username, String email) {
+    private void createDataBaseUser(String name, String username, String email) {
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -330,9 +365,10 @@ public class Entry extends AppCompatActivity {
                     UsersHelperClass googleuser = new UsersHelperClass(name, username, email);
 //            myRef.push().setValue(googleuser);
                     myRef.child(username).setValue(googleuser);
-                }else{
+                } else {
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
