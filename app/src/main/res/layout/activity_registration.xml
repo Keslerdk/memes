@@ -136,6 +136,7 @@
             android:text="Next"/>
 
         <Button
+            android:id="@+id/back_to_enter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Есть аккаунт? Войти"

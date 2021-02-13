@@ -64,6 +64,7 @@ public class Entry extends AppCompatActivity {
     private Button newAcc;
     private Button googleSignIn;
     private Button vkAuth;
+    private Button forgotPassword;
 
 //    TransportClient transportClient = HttpTransportClient.getInstance();
 //    VkApiClient vk = new VkApiClient(transportClient);
@@ -118,6 +119,7 @@ public class Entry extends AppCompatActivity {
         newAcc = (Button) findViewById(R.id.newAcc);
         googleSignIn = (Button) findViewById(R.id.googleSighIn);
         vkAuth = (Button) findViewById(R.id.vkAuth);
+        forgotPassword = (Button) findViewById(R.id.forgot_pswrd);
     }
 
     private void clickers() {
@@ -125,6 +127,7 @@ public class Entry extends AppCompatActivity {
         SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 signing(Elogin.getText().toString(), Epassword.getText().toString());
             }
         });
@@ -146,6 +149,13 @@ public class Entry extends AppCompatActivity {
             public void onClick(View v) {
                 VK.login(Entry.this, Arrays.asList(VKScope.EMAIL, VKScope.WALL));
 //                VKSdk.login(Entry.this,VKScope.EMAIL, VKScope.WALL);
+            }
+        });
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (Entry.this, ForgottenPassword.class);
+                startActivity(intent);
             }
         });
     }

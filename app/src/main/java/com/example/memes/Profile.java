@@ -1,10 +1,10 @@
 package com.example.memes;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -25,6 +25,7 @@ public class Profile extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mAuth.signOut();
+                finish();
             }
         });
     }

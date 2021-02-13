@@ -1,8 +1,5 @@
 package com.example.memes;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +7,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +33,7 @@ public class Registration extends AppCompatActivity {
     private EditText rPassword2;
 
     private Button signUp;
+    private Button backtoEnter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class Registration extends AppCompatActivity {
         rPassword2 = (EditText) findViewById(R.id.rPassword2);
 
         signUp = (Button) findViewById(R.id.next_button);
-
+        backtoEnter = (Button) findViewById(R.id.back_to_enter);
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,8 +68,14 @@ public class Registration extends AppCompatActivity {
                 //плохо работает.
                 if (emptyField(rname) && emptyField(ruserName) && emptyField(rEmail) && emptyField(rPassword)) {
                     registration(email, password);
-                    addUser(name, username, email);
+//                    addUser(name, username, email);
                 }
+            }
+        });
+        backtoEnter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 
@@ -81,6 +88,9 @@ public class Registration extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Toast.makeText(Registration.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(Registration.this, Verify.class);
+                    int index = email.indexOf('@');
+                    String intentmessage = "http://www."+email.substring(index);
+                    intent.putExtra("url", intentmessage);
                     startActivity(intent);
                 } else {
                     Toast.makeText(Registration.this, "Регистрация провалена", Toast.LENGTH_SHORT).show();
