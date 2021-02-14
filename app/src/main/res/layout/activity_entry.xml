@@ -16,19 +16,22 @@
         android:paddingTop="16dp"
         android:layout_marginTop="150dp">
         <TextView
+            android:id="@+id/enty_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="LOG IN"
             android:textSize="35dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:transitionName="entry_text"/>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/entry_emaillayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:hint="Email">
+            android:hint="Email"
+            android:transitionName="entry_email">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
@@ -37,13 +40,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/entru_pswrdlayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:hint="Password"
-            app:endIconMode="password_toggle">
+            app:endIconMode="password_toggle"
+            android:transitionName="entry_password">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editPassword"
+                android:transitionName="entry_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
@@ -55,6 +60,8 @@
             android:layout_height="wrap_content"
             android:text="Вход"/>
         <RelativeLayout
+            android:id="@+id/entry_btns"
+            android:transitionName="entry_Btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
@@ -76,11 +83,13 @@
             </RelativeLayout>
         <Button
             android:id="@+id/googleSighIn"
+            android:transitionName="entry_google"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Войти через Google"/>
         <Button
             android:id="@+id/vkAuth"
+            android:transitionName="entry_vk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Войти через vk"/>

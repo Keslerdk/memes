@@ -7,7 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,15 +58,21 @@ public class Entry extends AppCompatActivity {
     private GoogleSignInClient googleSignInClient;
 
     //элементы в активити
-    private EditText Elogin;
-    private EditText Epassword;
+//    private EditText Elogin;
+//    private EditText Epassword;
 
+    private TextView entrylogo;
 
     private Button SignIn;
     private Button newAcc;
     private Button googleSignIn;
     private Button vkAuth;
     private Button forgotPassword;
+
+    private TextInputLayout entryPswrdlayout;
+    private TextInputLayout entryEmaillayout;
+
+    private RelativeLayout entryBtns;
 
 //    TransportClient transportClient = HttpTransportClient.getInstance();
 //    VkApiClient vk = new VkApiClient(transportClient);
@@ -111,15 +119,19 @@ public class Entry extends AppCompatActivity {
 
     private void init() {
         //иницализация кнопок с layout
-        Elogin = (EditText) findViewById(R.id.editLogin);
-        Epassword = (EditText) findViewById(R.id.editPassword);
 
+        SignIn = (Button) findViewById(R.id.signIn); // кнопка входа
+        newAcc = (Button) findViewById(R.id.newAcc); // регистрация
+        googleSignIn = (Button) findViewById(R.id.googleSighIn);// войти через гугл
+        vkAuth = (Button) findViewById(R.id.vkAuth);// войти через вк
+        forgotPassword = (Button) findViewById(R.id.forgot_pswrd);// забытый пароль
 
-        SignIn = (Button) findViewById(R.id.signIn);
-        newAcc = (Button) findViewById(R.id.newAcc);
-        googleSignIn = (Button) findViewById(R.id.googleSighIn);
-        vkAuth = (Button) findViewById(R.id.vkAuth);
-        forgotPassword = (Button) findViewById(R.id.forgot_pswrd);
+        entryEmaillayout = (TextInputLayout) findViewById(R.id.entry_emaillayout); // поле с почтой
+        entryPswrdlayout = (TextInputLayout) findViewById(R.id.entru_pswrdlayout); // поле с паролем
+
+        entryBtns = (RelativeLayout) findViewById(R.id.entry_btns); // поле с кнопками входа и забытым паролем
+
+        entrylogo = (TextView) findViewById(R.id.enty_text); // текст сверх
     }
 
     private void clickers() {
@@ -127,8 +139,12 @@ public class Entry extends AppCompatActivity {
         SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                signing(Elogin.getText().toString(), Epassword.getText().toString());
+                Validate validate = new Validate(); // класс проверки
+                boolean emailform = validate.validEmail(entryEmaillayout);
+                boolean pswrdform = validate.validPasswordEntry(entryPswrdlayout);
+                if (emailform && pswrdform) {
+                    signing(entryEmaillayout.getEditText().getText().toString(), entryPswrdlayout.getEditText().getText().toString());
+                }
             }
         });
         newAcc.setOnClickListener(new View.OnClickListener() {
@@ -148,13 +164,12 @@ public class Entry extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 VK.login(Entry.this, Arrays.asList(VKScope.EMAIL, VKScope.WALL));
-//                VKSdk.login(Entry.this,VKScope.EMAIL, VKScope.WALL);
             }
         });
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (Entry.this, ForgottenPassword.class);
+                Intent intent = new Intent(Entry.this, ForgottenPassword.class);
                 startActivity(intent);
             }
         });
@@ -170,7 +185,21 @@ public class Entry extends AppCompatActivity {
                     Intent intent = new Intent(Entry.this, Profile.class);
                     startActivity(intent);
                 } else
-                    Toast.makeText(Entry.this, "Авторизация провалена", Toast.LENGTH_SHORT).show();
+                    try {
+                        throw task.getException();
+                    }
+//                    catch (FirebaseAuthInvalidUserException e) {
+//                        entryPswrdlayout.setError("Invalid user");
+//                    }
+//                    catch (FirebaseAuthInvalidCredentialsException e) {
+//                        entryPswrdlayout.setError("wrong password");
+//                    }
+                    catch (Exception e) {
+                        entryEmaillayout.getEditText().setText(null);
+                        entryPswrdlayout.getEditText().setText(null);
+                        entryPswrdlayout.setError("wrong email or password");
+                    }
+//                Toast.makeText(Entry.this, "Авторизация провалена", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -216,7 +245,6 @@ public class Entry extends AppCompatActivity {
                 break;
             default:
 //                вк
-
                 //vksdk 2.2.0 version
                 VKAuthCallback callback = new VKAuthCallback() {
                     @Override
@@ -251,22 +279,6 @@ public class Entry extends AppCompatActivity {
                     super.onActivityResult(requestCode, resultCode, data);
                 }
                 break;
-                /*
-                //vksdk 1.6.5
-                if (!VKSdk.onActivityResult(requestCode, resultCode, data, new VKCallback<VKAccessToken>() {
-                    @Override
-                    public void onResult(VKAccessToken res) {
-                        firebaseAuthwithVk(String.valueOf(res.userId)+"@vk.auth", String.valueOf(res.userId));
-                        vkrequest(res);
-                        // User passed Authorization
-                    }
-                    @Override
-                    public void onError(VKError error) {
-                        // User didn't pass Authorization
-                    }
-                })) {
-                    super.onActivityResult(requestCode, resultCode, data);
-                }*/
         }
     }
 
@@ -319,30 +331,6 @@ public class Entry extends AppCompatActivity {
                 }
             }
         });
-        //попытка через customToken
-        /*
-//        Log.d("vkAuthToken", AccessToken);
-//        String customToken = FirebaseAuth.getInstance().createCustomToken(AccessToken);
-        String token = FirebaseAuth.getInstance().creatCustomToken();
-        mAuth.signInWithCustomToken(customToken)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("yes", "signInWithCustomToken:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intent =  new Intent(Entry.this, Profile.class);
-                            startActivity(intent);
-                            Toast.makeText(Entry.this, "Good", Toast.LENGTH_SHORT);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("vkAuth", "signInWithCustomToken:failure", task.getException());
-                            Toast.makeText(Entry.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }); */
     }
 
     private void vkrequest(VKAccessToken vkAccessToken) {
@@ -353,8 +341,8 @@ public class Entry extends AppCompatActivity {
             @Override
             public void success(Object o) {
                 String firstName = request.firstname;
-                String id =request.id;
-                String email =request.firstname+"."+request.secondName+"@vk.auth";
+                String id = request.id;
+                String email = request.firstname + "." + request.secondName + "@vk.auth";
                 createDataBaseUser(firstName, id, email);
             }
 
@@ -384,4 +372,5 @@ public class Entry extends AppCompatActivity {
             }
         });
     }
+
 }
