@@ -22,15 +22,14 @@
             android:text="LOG IN"
             android:textSize="35dp"
             android:gravity="center"
-            android:transitionName="entry_text"/>
+            />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/entry_emaillayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:hint="Email"
-            android:transitionName="entry_email">
+            android:hint="Email">
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,8 +44,7 @@
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:hint="Password"
-            app:endIconMode="password_toggle"
-            android:transitionName="entry_password">
+            app:endIconMode="password_toggle">
             <com.google.android.material.textfield.TextInputEditText
                 android:transitionName="entry_password"
                 android:layout_width="match_parent"
@@ -61,7 +59,6 @@
             android:text="Вход"/>
         <RelativeLayout
             android:id="@+id/entry_btns"
-            android:transitionName="entry_Btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
@@ -83,13 +80,11 @@
             </RelativeLayout>
         <Button
             android:id="@+id/googleSighIn"
-            android:transitionName="entry_google"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Войти через Google"/>
         <Button
             android:id="@+id/vkAuth"
-            android:transitionName="entry_vk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Войти через vk"/>

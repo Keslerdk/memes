@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,8 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -26,11 +27,11 @@ public class Registration extends AppCompatActivity {
     private FirebaseDatabase database;
     private DatabaseReference myRef;
 
-    private EditText rname;
-    private EditText ruserName;
-    private EditText rEmail;
-    private EditText rPassword;
-    private EditText rPassword2;
+    private TextInputLayout rname;
+    private TextInputLayout ruserName;
+    private TextInputLayout rEmail;
+    private TextInputLayout rPassword1;
+    private TextInputLayout rPassword2;
 
     private Button signUp;
     private Button backtoEnter;
@@ -45,12 +46,11 @@ public class Registration extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
 
-
-        rname = (EditText) findViewById(R.id.name);
-        ruserName = (EditText) findViewById(R.id.userName);
-        rEmail = (EditText) findViewById(R.id.rEmail);
-        rPassword = (EditText) findViewById(R.id.rPassword);
-        rPassword2 = (EditText) findViewById(R.id.rPassword2);
+        rname = (TextInputLayout) findViewById(R.id.reg_name);
+        ruserName = (TextInputLayout) findViewById(R.id.reg_userName);
+        rEmail = (TextInputLayout) findViewById(R.id.reg_email);
+        rPassword1 = (TextInputLayout) findViewById(R.id.reg_password1);
+        rPassword2 = (TextInputLayout) findViewById(R.id.reg_assword2);
 
         signUp = (Button) findViewById(R.id.next_button);
         backtoEnter = (Button) findViewById(R.id.back_to_enter);
@@ -61,15 +61,22 @@ public class Registration extends AppCompatActivity {
                 database = FirebaseDatabase.getInstance();
                 myRef = database.getReference("users");
 
-                String name = rname.getText().toString();
-                String username = ruserName.getText().toString();
-                String email = rEmail.getText().toString();
-                String password = rPassword.getText().toString();
+                String name = rname.getEditText().getText().toString();
+                String username = ruserName.getEditText().getText().toString();
+                String email = rEmail.getEditText().getText().toString();
+                String password1 = rPassword1.getEditText().getText().toString();
                 //плохо работает.
-                if (emptyField(rname) && emptyField(ruserName) && emptyField(rEmail) && emptyField(rPassword)) {
-                    registration(email, password);
+                Validate valid = new Validate();
+                boolean nameform = valid.validname(rname);
+                boolean usernameform = valid.validUsername(ruserName);
+                boolean emailform = valid.validEmail(rEmail);
+                boolean passwordform = valid.validPasswordReg(rPassword1);
+                boolean twoPswrdsform = valid.equalsPassword(rPassword1, rPassword2);
+
+                if (nameform && usernameform && emailform && passwordform && twoPswrdsform)
+                    registration(name, username, email, password1);
 //                    addUser(name, username, email);
-                }
+
             }
         });
         backtoEnter.setOnClickListener(new View.OnClickListener() {
@@ -81,19 +88,28 @@ public class Registration extends AppCompatActivity {
 
     }
 
-    private void registration(String email, String password) {
+    private void registration(String name, String username, String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(Registration.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+                    addUser(name, username, email);
                     Intent intent = new Intent(Registration.this, Verify.class);
-                    int index = email.indexOf('@');
-                    String intentmessage = "http://www."+email.substring(index);
-                    intent.putExtra("url", intentmessage);
+//                    int index = email.indexOf('@');
+//                    String intentmessage = "http://www." + email.substring(index);
+//                    intent.putExtra("url", intentmessage);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(Registration.this, "Регистрация провалена", Toast.LENGTH_SHORT).show();
+                    try {
+                        throw task.getException();
+                    }
+                    catch (FirebaseAuthUserCollisionException e) {
+                        Toast.makeText(Registration.this, "Пользователь с таким email уже существует", Toast.LENGTH_SHORT).show();
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -102,17 +118,12 @@ public class Registration extends AppCompatActivity {
     private void addUser(String name, String userName, String email) {
         UsersHelperClass helperClass = new UsersHelperClass(name, userName, email);
 //        myRef.child(userName).setValue(helperClass);
-        myRef.push().setValue(helperClass);
+        myRef.child(userName).setValue(helperClass);
     }
 
-    private boolean emptyField(EditText editText) {
-        if (editText.getText().toString().isEmpty()) {
-            editText.setError("Field can't be empty!");
-            return false;
-        } else {
-            editText.setError(null);
-            return true;
-        }
-    }
+//    private boolean uniqUser (TextInputLayout username) {
+//        String val = username.getEditText().getText().toString();
+//
+//    }
 
 }
